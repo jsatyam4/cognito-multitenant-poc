@@ -1,0 +1,26 @@
+{
+  "slug": "hooli",
+  "displayName": "Hooli",
+  "appName": "Hooli Workspace",
+  "tagline": "Making the world a better place.",
+  "branding": {
+    "primary": "#2563EB",
+    "primaryText": "#FFFFFF",
+    "pageBackground": "#EFF5FF",
+    "accent": "#0F1E4A",
+    "pattern": "grid"
+  },
+  "loginMode": "own",
+  "theme": {
+    "layout": "centered",
+    "font": "rounded",
+    "radius": 20,
+    "welcomeTitle": "Hi again, Hooligan",
+    "welcomeText": "Your workspace is one sign-in away.",
+    "buttonLabel": "Continue",
+    "footerText": "Hooli internal use only."
+  },
+  "allowedEmailDomains": [
+    "hooli.com"
+  ]
+}

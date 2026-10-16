@@ -1,0 +1,12 @@
+{
+  "_comment": "Copy to config/idp.local.json (gitignored) and fill in. Leave a block out to skip that IdP. See docs/IDP-SETUP.md.",
+  "microsoft": {
+    "clientId": "00000000-0000-0000-0000-000000000000",
+    "clientSecret": "your-entra-client-secret-value",
+    "entraTenantId": "00000000-0000-0000-0000-000000000000"
+  },
+  "google": {
+    "clientId": "1234567890-abc.apps.googleusercontent.com",
+    "clientSecret": "GOCSPX-your-secret"
+  }
+}

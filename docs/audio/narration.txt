@@ -1,0 +1,132 @@
+Cognito multi-tenant login, proof of concept. An audio walkthrough of the full flow and design: what we built, why we built it that way, and how it works.
+[[slnc 900]]
+
+Part one. The problem.
+[[slnc 500]]
+We are building a multi-tenant software-as-a-service app. Every customer, which we call a tenant, gets its own branded login page. For example, Acme, Globex and Initech each see their own logo, their own colours and their own favicon.
+One codebase serves every tenant. And adding a new tenant has to be quick, and must not need a code deploy.
+On top of that, the app has three modules. Each module needs its own separate login page, and each tenant gets its own branded version of every page.
+Module one uses username and password only. Module two uses username and password, plus Microsoft login through Entra I D. Module three uses Google login, and that one is still to be confirmed.
+So with three tenants and three modules, we need nine branded login pages. And the requirement asks us to try two different tenant models, so in this proof of concept we actually build eighteen.
+[[slnc 500]]
+The requirement document lists eight things that each need a pass or fail result. Tenant isolation. A login U R L per tenant. Branding per tenant. Login flows. The O I D C standard with P K C E. Tokens that carry the tenant and the role. A sample app and a sample A P I. And tenant onboarding by script, with the time recorded.
+[[slnc 900]]
+
+Part two. What is really being tested.
+[[slnc 500]]
+When you strip it down, there is one core question. Can every tenant get a branded, hosted login page for every module, without a deploy, both to add a tenant and to change its branding?
+Everything else is plumbing around that.
+While analysing the requirement, a few hidden details turned out to decide the whole design on Cognito. Let's go through them, because they explain every choice that follows.
+[[slnc 900]]
+
+Part three. The Cognito findings that shape the design.
+[[slnc 500]]
+Finding one. In Cognito, branding is attached to an app client, not to a user pool. An app client is basically one application that is allowed to log users in. That fits our need perfectly. We treat each module as its own app client, so each module automatically gets its own login page with its own branding.
+[[slnc 400]]
+Finding two. A user pool, which is Cognito's user directory, can only have one login domain. So if every tenant has its own pool, every tenant gets its own login address. If all tenants share one pool, they all share one login address.
+[[slnc 400]]
+Finding three, and this is the big one. Inside a single pool, every username and every email must be unique. So in a shared pool, Jane at company dot com cannot have an account in both Acme and Globex. The requirement says the same email must be able to exist in two tenants. That means the shared pool model fails that test, and it's not a configuration problem. It's how Cognito works.
+[[slnc 400]]
+Finding four. Cognito's hosted login page can change colours, logos, backgrounds and the favicon, but it cannot change the text on the page. So the tenant's app name can't be written as text. Our workaround is to generate the logo image with the app name inside it.
+[[slnc 400]]
+Finding five. To put the tenant I D and the role inside the tokens, we use a Lambda function that Cognito calls just before it issues tokens. It's called the pre token generation trigger, version two. Adding claims to the access token, which is the token the A P I reads, needs the Essentials pricing tier.
+[[slnc 400]]
+Finding six. API Gateway has a built-in J W T checker, but it only trusts one issuer. With one pool per tenant, every tenant is a different issuer. Using the built-in checker would mean a deploy for every new tenant, which breaks the no-deploy rule. So we verify tokens ourselves inside a Lambda, and the list of trusted issuers comes from a database at runtime.
+[[slnc 400]]
+Finding seven. Cognito keeps a login session cookie on its login domain. So if you sign in to module one and then click module two in the same pool, Cognito lets you straight in, without showing module two's login page. To make sure every module shows its own page, the app sends a parameter called prompt equals login. There's a toggle in the demo to show both behaviours.
+[[slnc 400]]
+Finding eight. Cognito's rate limits, like login requests per second, are shared across every pool in the account and region. Adding more pools does not give you more capacity.
+[[slnc 900]]
+
+Part four. The architecture.
+[[slnc 500]]
+Think of the system as two layers: a shared platform that is deployed once, and the tenants that are created at runtime.
+[[slnc 400]]
+The shared platform is deployed once with the A W S C D K. It contains four things.
+First, a single React web app, hosted on S 3 behind CloudFront. It has no tenant baked into it. It reads the tenant from the URL, for example slash t slash acme, and fetches that tenant's settings.
+Second, a sample A P I, built with API Gateway and a Lambda function.
+Third, a DynamoDB table called the tenant registry. It holds one row per tenant, with its pool, its login domain, its three app client I Ds and its branding.
+Fourth, the two Cognito trigger functions: the pre token generation function and the pre authentication function. One copy of each serves every pool.
+[[slnc 400]]
+Tenants are not in that deployment at all. They're created by a script that calls the A W S S D K directly. For a new tenant, the script creates the user pool, its login domain, the admin and user groups, the Microsoft and Google identity providers, three app clients, and three branding styles. Then it writes one row into the registry.
+The moment that row exists, the web app shows the tenant and the A P I trusts its tokens. No deploy happens. That's how we meet the quick onboarding requirement.
+[[slnc 900]]
+
+Part five. The two tenant models.
+[[slnc 500]]
+The requirement asked us to try both models, so both are built side by side.
+[[slnc 400]]
+Model A is one user pool per tenant. Acme, Globex and Initech each get their own pool. Isolation is structural. An Acme user simply does not exist in Globex's pool. Jane can exist in all three, with three separate identities. Each tenant has its own login address, and can later get its own custom domain, like login dot acme dot our app dot com. Each tenant can even have its own password and M F A policy.
+The costs are that each new pool needs its redirect address added to the Microsoft and Google app registrations, and there's a default limit of one thousand pools per region, which can be raised to ten thousand.
+[[slnc 400]]
+Model B is one shared pool. Every user has a custom attribute called tenant I D that can never be changed. When someone signs in, the pre authentication function checks that the user's tenant matches the tenant that owns the app client. If an Acme user tries Globex's login page, they get a generic "incorrect username or password" message, so nobody can probe which emails exist. The pre token function repeats the check, which also covers Microsoft and Google users.
+The weakness is that the same email cannot exist in two tenants, and all tenants share one login address.
+[[slnc 900]]
+
+Part six. How a login actually works, step by step.
+[[slnc 500]]
+Step one. The user opens the app at slash t slash acme. The web app calls the public A P I and gets Acme's settings: its issuer, its login domain, its three client I Ds and its branding. The page paints itself in Acme's colours, sets Acme's favicon and shows Acme's logo.
+[[slnc 300]]
+Step two. The user clicks "Sign in to Finance", which is module two. The app creates a random secret called a code verifier, hashes it into a code challenge, and redirects the browser to Acme's Cognito login domain, with module two's client I D and that code challenge. That's the P K C E part. It protects the login even though a browser app can't keep a secret.
+[[slnc 300]]
+Step three. Cognito shows Acme's branded login page for module two, with a username and password form and a Microsoft button.
+[[slnc 300]]
+Step four. The user signs in. Just before issuing tokens, Cognito calls our pre token function. That function looks up which tenant owns this client, checks the user's group, and adds four claims to both the I D token and the access token: tenant I D, tenant model, role, and module.
+[[slnc 300]]
+Step five. Cognito redirects back to the app's callback page with a one-time code. The app exchanges that code, together with the original code verifier, for tokens. Cognito checks that the verifier matches the challenge from step two, so a stolen code is useless on its own.
+[[slnc 300]]
+Step six. The app calls the A P I with the access token. The A P I does six checks, in order. Is there a token at all. Is the issuer one of our registered pools. Is the signature valid against that pool's public keys, and is it an access token that hasn't expired. Does the client I D belong to that pool. Does the tenant I D claim match the tenant that owns that client. And finally, does it match the tenant in the U R L.
+If an Acme token is used on Globex's data, the A P I returns four oh three, wrong tenant. Admin routes also check that the role is admin.
+[[slnc 300]]
+Step seven, logout. The app revokes the refresh token, clears its local session, and sends the browser to Cognito's logout address, which clears Cognito's own session cookie and returns to the tenant's page.
+[[slnc 900]]
+
+Part seven. Each requirement, and how it's shown.
+[[slnc 500]]
+Requirement one, tenant isolation. Proven by logging every tenant's admin into every other tenant, which must fail, and by Jane existing in every pool. Model A passes. Model B passes the cross-tenant test but fails the same-email test.
+[[slnc 300]]
+Requirement two, a login U R L per tenant. Each tenant has its own app path, and in model A its own login host. Custom domains weren't tested, because no domain was available.
+[[slnc 300]]
+Requirement three, branding. Logo, favicon, background and primary colour are set per client through Cognito's branding A P I. Changing branding is one A P I call per client, live on the next page load, with no deploy. App name as text is a partial pass, because of the platform limit we discussed.
+[[slnc 300]]
+Requirement four, login flows. Each module has its own client and page. Forgot password and logout are built in. Microsoft and Google are wired up and switch on once credentials are added. T O T P multi-factor authentication is enabled, and can be made mandatory per tenant with one command.
+[[slnc 300]]
+Requirement five, O I D C authorization code with P K C E. The clients only allow the code flow, have no secret, and reject the older implicit flow.
+[[slnc 300]]
+Requirement six, tokens. Tenant I D and role are in both tokens, plus extra profile attributes like department and employee I D.
+[[slnc 300]]
+Requirement seven, the app and A P I. The demo page has buttons that try the attacks live: a token from another tenant, no token, a tampered token, and an I D token used in place of an access token. Each one is rejected with the right error.
+[[slnc 300]]
+Requirement eight, onboarding. One command creates a tenant, timing every step and saving the times to a log. The expected time is around fifteen to thirty seconds for model A and five to ten seconds for model B, to be confirmed by the live run.
+[[slnc 300]]
+There is also an automated test script that runs all of these checks against the live deployment and writes a pass or fail table.
+[[slnc 900]]
+
+Part eight. Limits and cost.
+[[slnc 500]]
+The main limits are: one thousand pools per region by default, one thousand app clients per pool, and login request rates that are shared across the whole account. Custom attributes are capped at fifty per pool and can never be deleted, so the user profile schema needs planning up front.
+[[slnc 400]]
+On cost, Cognito charges per monthly active user, not per pool or per tenant, so both models cost the same. On the Essentials tier, the first ten thousand active users are free, and after that it's one and a half cents per user per month. Users who sign in with Microsoft or Google cost the same rate, with the first fifty free.
+Assume fifty active users per tenant, with one in five using Microsoft or Google. Then one hundred tenants costs roughly fourteen dollars a month, and one thousand tenants costs roughly six hundred dollars a month. The rest of the platform adds well under thirty dollars.
+[[slnc 900]]
+
+Part nine. The recommendation.
+[[slnc 500]]
+If Cognito is chosen, use one user pool per tenant.
+It's the only model that fully meets the isolation requirement, including the same email in two tenants. Each tenant gets its own login address and its own security policy, and isolation doesn't depend on custom code.
+[[slnc 300]]
+The things to accept are: the pool limit per region, which means planning for multiple accounts or regions at large scale. Login rate limits that are shared across the account. Registering each new pool with Microsoft and Google, which should be automated. And branding that's limited to what Cognito's editor allows, with no custom page text or HTML.
+[[slnc 300]]
+The shared pool only makes sense if one person will never need accounts in two tenants, and everyone is happy with a single shared login address.
+[[slnc 900]]
+
+Part ten. Where things stand, and what's next.
+[[slnc 500]]
+All the code is written and checked offline. It type-checks, the infrastructure template builds, the Lambda logic passed tests against fake data, and the user interface was checked against a mock A P I.
+Nothing has been deployed to A W S. You do that yourself, from your own terminal, after setting your A W S profile and confirming the account.
+[[slnc 300]]
+The order is: install, bootstrap C D K, deploy, onboard all tenants, seed the demo users, then run the test script. The full steps are in the P O C guide in the repo.
+[[slnc 300]]
+After the live run, three things are left: fill in the comparison table with the real results, add Microsoft and Google credentials to light up modules two and three, and, when a domain is available, add custom login domains per tenant.
+[[slnc 600]]
+That's the complete flow and design. Thanks for listening.

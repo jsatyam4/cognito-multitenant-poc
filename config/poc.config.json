@@ -1,0 +1,11 @@
+{
+  "region": "ap-south-1",
+  "resourcePrefix": "cpoc",
+  "demoEmailTemplate": "CHANGE_ME+{tenant}-{user}@gmail.com",
+  "forcePromptLogin": true,
+  "localDevOrigin": "http://localhost:5173",
+  "limits": {
+    "maxTenants": 10,
+    "maxUsersPerTenant": 5
+  }
+}

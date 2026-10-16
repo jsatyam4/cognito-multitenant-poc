@@ -1,0 +1,53 @@
+{
+  "name": "cognito-multitenant-poc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-tenant branded login POC on Amazon Cognito (managed login, OIDC + PKCE, per-tenant per-module app clients)",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --import tsx --test --test-reporter=spec tests/*.test.ts",
+    "build:frontend": "npm --prefix frontend run build",
+    "synth": "npm run build:frontend && cdk synth",
+    "infra:up": "tsx scripts/infra-up.ts",
+    "infra:down": "tsx scripts/infra-down.ts",
+    "deploy": "npm run build:frontend && cdk deploy CognitoPocPlatform --require-approval never --outputs-file .poc/outputs.json",
+    "idp-uris": "tsx scripts/idp-uris.ts",
+    "enable-idp": "tsx scripts/enable-idp.ts",
+    "onboard": "tsx scripts/onboard.ts",
+    "onboard:all": "tsx scripts/onboard-all.ts",
+    "seed": "tsx scripts/seed-users.ts",
+    "rebrand": "tsx scripts/rebrand.ts",
+    "mfa": "tsx scripts/mfa.ts",
+    "test:poc": "tsx scripts/test-poc.ts",
+    "offboard": "tsx scripts/offboard.ts",
+    "teardown": "tsx scripts/teardown.ts",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "local:api": "tsx scripts/local-api.ts",
+    "api": "tsx scripts/api-server.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.1152.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.1152.0",
+    "@aws-sdk/client-dynamodb": "^3.1152.0",
+    "@aws-sdk/client-iam": "^3.1152.0",
+    "@aws-sdk/client-lambda": "^3.1152.0",
+    "@aws-sdk/client-sts": "^3.1152.0",
+    "@aws-sdk/lib-dynamodb": "^3.1152.0",
+    "amazon-cognito-identity-js": "^6.3.22",
+    "aws-jwt-verify": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.164",
+    "@types/node": "^22.10.0",
+    "aws-cdk": "^2.1145.0",
+    "aws-cdk-lib": "^2.273.0",
+    "constructs": "^10.8.1",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3"
+  }
+}

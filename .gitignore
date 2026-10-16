@@ -1,0 +1,14 @@
+node_modules/
+frontend/node_modules/
+frontend/dist/
+cdk.out/
+.poc/
+config/idp.local.json
+results/*.json
+results/results.md
+.DS_Store
+.env
+.env.*
+!.env.example
+.idea/
+*.log

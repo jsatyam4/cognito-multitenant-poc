@@ -1,0 +1,16 @@
+{
+  "slug": "acme",
+  "displayName": "Acme Corp",
+  "appName": "Acme Workspace",
+  "tagline": "Build anything. Ship everything.",
+  "branding": {
+    "primary": "#E4572E",
+    "primaryText": "#FFFFFF",
+    "pageBackground": "#FFF4EE",
+    "accent": "#29335C",
+    "pattern": "dots"
+  },
+  "allowedEmailDomains": [
+    "acme.com"
+  ]
+}

@@ -1,0 +1,9 @@
+node_modules
+frontend
+cdk.out
+.poc
+.env
+.env.*
+results
+.idea
+*.log

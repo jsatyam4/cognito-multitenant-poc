@@ -1,0 +1,16 @@
+{
+  "slug": "initech",
+  "displayName": "Initech",
+  "appName": "Initech Portal",
+  "tagline": "TPS reports, now with SSO.",
+  "branding": {
+    "primary": "#5B3FD9",
+    "primaryText": "#FFFFFF",
+    "pageBackground": "#F2EFFD",
+    "accent": "#1E1452",
+    "pattern": "diagonal"
+  },
+  "allowedEmailDomains": [
+    "initech.com"
+  ]
+}

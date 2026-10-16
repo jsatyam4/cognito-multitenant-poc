@@ -1,0 +1,16 @@
+{
+  "slug": "globex",
+  "displayName": "Globex Corporation",
+  "appName": "Globex Hub",
+  "tagline": "Global logistics, one login.",
+  "branding": {
+    "primary": "#1B998B",
+    "primaryText": "#FFFFFF",
+    "pageBackground": "#EAF7F5",
+    "accent": "#0B3C49",
+    "pattern": "grid"
+  },
+  "allowedEmailDomains": [
+    "globex.com"
+  ]
+}

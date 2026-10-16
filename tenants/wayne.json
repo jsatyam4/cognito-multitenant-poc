@@ -1,0 +1,26 @@
+{
+  "slug": "wayne",
+  "displayName": "Wayne Enterprises",
+  "appName": "Wayne Connect",
+  "tagline": "Onboarded live during the demo.",
+  "branding": {
+    "primary": "#1F2937",
+    "primaryText": "#FFFFFF",
+    "pageBackground": "#F3F4F6",
+    "accent": "#111827",
+    "pattern": "grid"
+  },
+  "loginMode": "own",
+  "theme": {
+    "layout": "centered",
+    "font": "system",
+    "radius": 8,
+    "welcomeTitle": "Wayne Connect",
+    "welcomeText": "Sign in with your Wayne Enterprises account.",
+    "buttonLabel": "Sign in",
+    "footerText": "Gotham HQ IT support: ext. 4400"
+  },
+  "allowedEmailDomains": [
+    "wayne.com"
+  ]
+}

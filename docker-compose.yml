@@ -1,0 +1,13 @@
+# Local stack: the sample API in Docker; Cognito, the trigger Lambdas and the registry table are in AWS.
+#   npm run infra:up            # once, writes .poc/outputs.json
+#   docker compose up --build   # API on http://localhost:8787
+#   npm run dev:frontend        # app on http://localhost:5173
+services:
+  api:
+    build: .
+    ports:
+      - "8787:8787"
+    env_file: .env                     # AWS keys and settings (see .env.example), read at run time only
+    volumes:
+      - ./.poc/outputs.json:/app/.poc/outputs.json:ro
+    restart: unless-stopped

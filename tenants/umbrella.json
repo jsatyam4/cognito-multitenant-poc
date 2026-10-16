@@ -1,0 +1,26 @@
+{
+  "slug": "umbrella",
+  "displayName": "Umbrella Health",
+  "appName": "Umbrella Care",
+  "tagline": "Care teams, one secure sign-in.",
+  "branding": {
+    "primary": "#C1121F",
+    "primaryText": "#FFFFFF",
+    "pageBackground": "#FDF0F0",
+    "accent": "#3D0A0E",
+    "pattern": "dots"
+  },
+  "loginMode": "own",
+  "theme": {
+    "layout": "split",
+    "font": "system",
+    "radius": 12,
+    "welcomeTitle": "Welcome to Umbrella Care",
+    "welcomeText": "Sign in to see your patients, shifts and messages.",
+    "buttonLabel": "Sign in securely",
+    "footerText": "Need help? Contact the Umbrella IT service desk."
+  },
+  "allowedEmailDomains": [
+    "umbrella.com"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "slug": "stark",
+  "displayName": "Stark Industries",
+  "appName": "Stark Command",
+  "tagline": "Engineering at scale.",
+  "branding": {
+    "primary": "#B8860B",
+    "primaryText": "#111111",
+    "pageBackground": "#FBF6EA",
+    "accent": "#3A2A05",
+    "pattern": "diagonal"
+  },
+  "loginMode": "own",
+  "theme": {
+    "layout": "split",
+    "font": "serif",
+    "radius": 4,
+    "welcomeTitle": "Stark Command",
+    "welcomeText": "Authorised personnel only. All access is logged.",
+    "buttonLabel": "Authenticate",
+    "footerText": "Lost access? Contact Stark Security Operations."
+  },
+  "allowedEmailDomains": [
+    "stark.com"
+  ]
+}
