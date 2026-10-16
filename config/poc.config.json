@@ -7,5 +7,8 @@
   "limits": {
     "maxTenants": 10,
     "maxUsersPerTenant": 5
-  }
+  },
+  "publicOrigins": [
+    "https://cognito-multitenant-poc.vercel.app"
+  ]
 }

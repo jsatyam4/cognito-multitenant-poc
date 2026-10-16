@@ -1,8 +1,9 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { awsCredentials, awsRegion } from './aws-credentials';
 import { clientKey, poolKey, type ClientLookup, type ModuleId, type PoolLookup, type TenantBranding, type TenantRecord, type TenantTheme } from '../shared/types';
 
-const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({ region: awsRegion(), credentials: awsCredentials() }));
 const TABLE = process.env.TENANT_TABLE!;
 const TTL_MS = 30_000;
 /** Misses are cached briefly too, so requests for random ids can't hammer the table. */

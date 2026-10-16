@@ -12,3 +12,4 @@ results/results.md
 !.env.example
 .idea/
 *.log
+.vercel/

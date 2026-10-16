@@ -180,7 +180,7 @@ export async function createModuleClient(
 ): Promise<TenantModuleClient> {
   const o = outputs();
   const { idps, missing } = idpsForModule(module, availableIdps);
-  const origins = [...new Set([o.AppUrl, config.localDevOrigin])];
+  const origins = [...new Set([o.AppUrl, config.localDevOrigin, ...(config.publicOrigins ?? [])])];
   const readAttrs = ['email', 'email_verified', 'name', 'custom:department', 'custom:employee_id'];
   if (model === 'shared') readAttrs.push('custom:tenant_id');
 

@@ -14,6 +14,8 @@ export interface PocConfig {
   demoEmailTemplate: string;
   forcePromptLogin: boolean;
   localDevOrigin: string;
+  /** Extra public app addresses (e.g. the Vercel URL) registered on every new app client */
+  publicOrigins?: string[];
   /** Free-tier guardrails: scripts refuse to go past these */
   limits: { maxTenants: number; maxUsersPerTenant: number };
 }

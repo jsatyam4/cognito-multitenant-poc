@@ -27,14 +27,19 @@
     "teardown": "tsx scripts/teardown.ts",
     "dev:frontend": "npm --prefix frontend run dev",
     "local:api": "tsx scripts/local-api.ts",
-    "api": "tsx scripts/api-server.ts"
+    "api": "tsx scripts/api-server.ts",
+    "vercel:build": "tsx scripts/vercel-build.ts",
+    "vercel:aws": "tsx scripts/vercel-aws-setup.ts",
+    "add-origin": "tsx scripts/add-origin.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudfront": "^3.1152.0",
     "@aws-sdk/client-cloudwatch-logs": "^3.1152.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.1152.0",
     "@aws-sdk/client-dynamodb": "^3.1152.0",
     "@aws-sdk/client-iam": "^3.1152.0",
     "@aws-sdk/client-lambda": "^3.1152.0",
+    "@aws-sdk/client-s3": "^3.1152.0",
     "@aws-sdk/client-sts": "^3.1152.0",
     "@aws-sdk/lib-dynamodb": "^3.1152.0",
     "amazon-cognito-identity-js": "^6.3.22",
